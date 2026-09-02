@@ -33,7 +33,7 @@ RU_WHITELIST = [
 ]
 INTL_WHITELIST = [
     "steampowered", "cloudflare", "hetzner", "windowsupdate", "google.com", "microsoft.com",
-    "yahoo", "deepseek", "yektanet", "bale.ai", "zoom.us",
+    "yahoo", "deepseek", "yektanet", "bale.ai", "zoom.us", "beboo.ru",
 ]
 WIDE_WHITELIST = RU_WHITELIST + INTL_WHITELIST
 BLOCKED = ["instagram", "facebook", "twitter", "x.com", "bbc", "meduza", "linkedin", "torproject", "tor."]
