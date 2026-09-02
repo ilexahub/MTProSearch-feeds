@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-09-02T15:06:47Z",
+  "generated_at": "2026-09-02T18:06:32Z",
   "ports": [
     443,
     853,
     8443
   ],
   "dedupe": "host|port",
+  "split": "ru_whitelist_sni",
+  "fetch": {
+    "ok": 3,
+    "fail": 0,
+    "kept": 693
+  },
   "ru": {
-    "ok": 7,
-    "fail": 0,
-    "kept": 262
+    "kept": 223
   },
-  "eu": {
-    "ok": 7,
-    "fail": 0,
-    "kept": 197
+  "en": {
+    "kept": 470
   },
-  "etc": {
-    "ok": 29,
-    "fail": 0,
-    "kept": 411,
-    "subtracted_ru_eu": 216
-  }
+  "legacy_copied": [
+    "proxy-eu.txt",
+    "proxy-etc.txt"
+  ]
 }

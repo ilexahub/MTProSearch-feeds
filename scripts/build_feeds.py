@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build pre-filtered RU / EU / ETC MTProto lists. Formal checks only — no TCP to proxies."""
+"""Build pre-filtered RU / EN MTProto lists. Formal checks only — no TCP to proxies."""
 
 from __future__ import annotations
 
@@ -29,11 +29,11 @@ RU_WHITELIST = [
     "yandex", "ya.ru", "dzen.ru", "mail.ru", "ok.ru", "rutube", "kinopoisk", "ozon.ru",
     "ozonusercontent", "wildberries", "wb.ru", "avito.ru", "hh.ru", "cian.ru", "microsoft.ru",
     "mts.ru", "beeline.ru", "megafon.ru", "1c.ru", "1c.com", "1c.", "petrovich", "x5.ru", "x5.",
-    "game.ru", "dns-shop", "magnit.ru",
+    "game.ru", "dns-shop", "magnit.ru", "beboo.ru",
 ]
 INTL_WHITELIST = [
     "steampowered", "cloudflare", "hetzner", "windowsupdate", "google.com", "microsoft.com",
-    "yahoo", "deepseek", "yektanet", "bale.ai", "zoom.us", "beboo.ru",
+    "yahoo", "deepseek", "yektanet", "bale.ai", "zoom.us",
 ]
 WIDE_WHITELIST = RU_WHITELIST + INTL_WHITELIST
 BLOCKED = ["instagram", "facebook", "twitter", "x.com", "bbc", "meduza", "linkedin", "torproject", "tor."]
@@ -50,6 +50,16 @@ MTPRO_XYZ_URLS = [
     "https://mtpro.xyz/wp-json/wp/v2/pages?slug=mtproto",
     "https://mtpro.xyz/wp-json/wp/v2/pages?slug=mtproto-ru",
 ]
+
+KORT_PATHS = [
+    "proxy_ru.txt",
+    "proxy_eu.txt",
+    "proxy_all.txt",
+    "verified/proxy_us_verified.txt",
+    "verified/proxy_asia_verified.txt",
+]
+
+RAW_URLS = AUTHOR_URLS + MTPRO_XYZ_URLS
 
 ETC_URLS = [
     "https://raw.githubusercontent.com/ALIILAPRO/MTProtoProxy/main/mtproto.txt",
@@ -307,6 +317,11 @@ def accepted(proxy: Proxy) -> bool:
     return not any(m in sni for m in BLOCKED)
 
 
+def is_ru_sni(sni: str) -> bool:
+    domain = sni.lower()
+    return any(marker in domain for marker in RU_WHITELIST)
+
+
 def collect(urls_groups: list[list[str]]) -> tuple[dict[str, Proxy], dict]:
     unique: dict[str, Proxy] = {}
     ok = 0
@@ -337,38 +352,35 @@ def main() -> int:
     root = Path(__file__).resolve().parents[1]
     feeds_dir = root / "feeds"
 
-    ru_urls = [github("kort0881", "telegram-proxy-collector", "main", "proxy_ru.txt")] + [
-        [u] for u in AUTHOR_URLS + MTPRO_XYZ_URLS
-    ]
-    eu_urls = [github("kort0881", "telegram-proxy-collector", "main", "proxy_eu.txt")] + [
-        [u] for u in AUTHOR_URLS + MTPRO_XYZ_URLS
-    ]
-    etc_urls = [github("kort0881", "telegram-proxy-collector", "main", "proxy_all.txt")] + [
-        [u] for u in ETC_URLS + MTPRO_XYZ_URLS
+    all_urls = [github("kort0881", "telegram-proxy-collector", "main", path) for path in KORT_PATHS] + [
+        [u] for u in RAW_URLS + ETC_URLS
     ]
 
-    print("=== RU ===", file=sys.stderr)
-    ru, ru_stats = collect(ru_urls)
-    print("=== EU ===", file=sys.stderr)
-    eu, eu_stats = collect(eu_urls)
-    print("=== ETC ===", file=sys.stderr)
-    etc_raw, etc_stats = collect(etc_urls)
+    print("=== ALL ===", file=sys.stderr)
+    pool, fetch_stats = collect(all_urls)
 
-    ru_eu_keys = set(ru) | set(eu)
-    etc = {k: v for k, v in etc_raw.items() if k not in ru_eu_keys}
-    subtracted = len(etc_raw) - len(etc)
+    ru: dict[str, Proxy] = {}
+    en: dict[str, Proxy] = {}
+    for key, proxy in pool.items():
+        if is_ru_sni(proxy.sni):
+            ru[key] = proxy
+        else:
+            en[key] = proxy
 
     write_list(feeds_dir / "proxy-ru.txt", ru)
-    write_list(feeds_dir / "proxy-eu.txt", eu)
-    write_list(feeds_dir / "proxy-etc.txt", etc)
+    write_list(feeds_dir / "proxy-en.txt", en)
+    write_list(feeds_dir / "proxy-eu.txt", en)
+    write_list(feeds_dir / "proxy-etc.txt", en)
 
     meta = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "ports": sorted(ALLOWED_PORTS),
         "dedupe": "host|port",
-        "ru": ru_stats,
-        "eu": eu_stats,
-        "etc": {**etc_stats, "kept": len(etc), "subtracted_ru_eu": subtracted},
+        "split": "ru_whitelist_sni",
+        "fetch": fetch_stats,
+        "ru": {"kept": len(ru)},
+        "en": {"kept": len(en)},
+        "legacy_copied": ["proxy-eu.txt", "proxy-etc.txt"],
     }
     (feeds_dir / "meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(meta, indent=2))
