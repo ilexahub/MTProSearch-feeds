@@ -16,7 +16,7 @@ from urllib.parse import parse_qs, urlparse
 
 USER_AGENT = "MTProSearch-feeds/1.0"
 CONNECT_READ_TIMEOUT = 20
-ALLOWED_PORTS = {443, 8443}
+ALLOWED_PORTS = {443, 8443, 853}
 HOST_OK = re.compile(r"^[A-Za-z0-9._~-]+$")
 IPV6 = re.compile(r"^\[[0-9a-fA-F:]+]$")
 HEX_RE = re.compile(r"^[0-9a-fA-F]+$")

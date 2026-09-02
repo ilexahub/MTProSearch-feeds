@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-09-02T07:56:13Z",
+  "generated_at": "2026-09-02T07:58:07Z",
   "ports": [
     443,
+    853,
     8443
   ],
   "dedupe": "host|port",
   "ru": {
     "ok": 5,
     "fail": 0,
-    "kept": 95
+    "kept": 109
   },
   "eu": {
     "ok": 5,
     "fail": 0,
-    "kept": 147
+    "kept": 145
   },
   "etc": {
-    "ok": 28,
-    "fail": 0,
-    "kept": 214,
-    "subtracted_ru_eu": 150
+    "ok": 27,
+    "fail": 1,
+    "kept": 216,
+    "subtracted_ru_eu": 163
   }
 }
