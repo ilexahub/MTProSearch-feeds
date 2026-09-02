@@ -8,8 +8,8 @@ GitHub Actions каждые 4 часа обходит публичные ист�
 
 | Файл | Что внутри |
 |------|------------|
-| [feeds/proxy-ru.txt](feeds/proxy-ru.txt) | kort `proxy_ru` + 4 авторских списка, узкая RU-маска SNI |
-| [feeds/proxy-eu.txt](feeds/proxy-eu.txt) | kort `proxy_eu` + 4 авторских, широкая маска |
+| [feeds/proxy-ru.txt](feeds/proxy-ru.txt) | kort `proxy_ru` + 4 авторских списка |
+| [feeds/proxy-eu.txt](feeds/proxy-eu.txt) | kort `proxy_eu` + 4 авторских |
 | [feeds/proxy-etc.txt](feeds/proxy-etc.txt) | upstream kort + `proxy_all`, минус host:port из RU и EU |
 | [feeds/meta.json](feeds/meta.json) | время сборки и счётчики |
 
@@ -17,8 +17,10 @@ GitHub Actions каждые 4 часа обходит публичные ист�
 
 - валидная ссылка и FakeTLS-секрет с SNI
 - порт **443**, **8443** или **853** (DNS-over-TLS)
-- SNI не в чёрном списке; RU — узкий белый список, EU/Прочие — широкий
+- SNI не в чёрном списке
 - уникальность по `host\|port` (первая подходящая строка)
+
+Белые маски SNI (RU / международные) **не** применяются при сборке — их режет приложение галкой **TrueMask**.
 
 ## Скачать
 

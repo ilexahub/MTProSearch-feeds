@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-02T08:28:49Z",
+  "generated_at": "2026-09-02T08:46:14Z",
   "ports": [
     443,
     853,
@@ -9,17 +9,17 @@
   "ru": {
     "ok": 7,
     "fail": 0,
-    "kept": 104
+    "kept": 276
   },
   "eu": {
     "ok": 7,
     "fail": 0,
-    "kept": 136
+    "kept": 205
   },
   "etc": {
     "ok": 29,
     "fail": 0,
-    "kept": 236,
-    "subtracted_ru_eu": 171
+    "kept": 426,
+    "subtracted_ru_eu": 191
   }
 }
