@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-09-02T07:49:43Z",
+  "ports": [
+    443,
+    8443
+  ],
+  "dedupe": "host|port",
+  "ru": {
+    "ok": 5,
+    "fail": 0,
+    "kept": 96
+  },
+  "eu": {
+    "ok": 5,
+    "fail": 0,
+    "kept": 144
+  },
+  "etc": {
+    "ok": 27,
+    "fail": 1,
+    "kept": 214,
+    "subtracted_ru_eu": 150
+  }
+}
