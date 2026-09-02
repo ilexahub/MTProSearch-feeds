@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import base64
+import html
 import json
 import re
 import sys
@@ -44,9 +45,14 @@ AUTHOR_URLS = [
     "https://raw.githubusercontent.com/Grim1313/mtproto-for-telegram/master/all_proxies.txt",
 ]
 
+# HTML /mtproto does not contain tg://; the list is eval(atob(...)) inside wp-json.
+MTPRO_XYZ_URLS = [
+    "https://mtpro.xyz/wp-json/wp/v2/pages?slug=mtproto",
+    "https://mtpro.xyz/wp-json/wp/v2/pages?slug=mtproto-ru",
+]
+
 ETC_URLS = [
     "https://raw.githubusercontent.com/ALIILAPRO/MTProtoProxy/main/mtproto.txt",
-    "https://mtpro.xyz/api/?type=mtproto-ru",
     "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no1.txt",
     "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no2.txt",
     "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no3.txt",
@@ -239,7 +245,51 @@ def walk_json(obj: object) -> list[str]:
     return found
 
 
+def extract_mtpro_xyz_lines(body: str) -> list[str]:
+    """mtpro.xyz embeds the list as eval(atob(...)) instead of tg:// lines."""
+    text = html.unescape(body)
+    match = re.search(r"eval\(atob\(['\"]([A-Za-z0-9+/=]+)['\"]\)\)", text)
+    if not match:
+        return []
+    try:
+        decoded = base64.b64decode(match.group(1)).decode("utf-8")
+    except Exception:
+        return []
+    start = decoded.find("[")
+    if start < 0:
+        return []
+    depth = 0
+    end = None
+    for index, char in enumerate(decoded[start:], start):
+        if char == "[":
+            depth += 1
+        elif char == "]":
+            depth -= 1
+            if depth == 0:
+                end = index + 1
+                break
+    if end is None:
+        return []
+    try:
+        items = json.loads(decoded[start:end])
+    except json.JSONDecodeError:
+        return []
+    lines: list[str] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        host = str(item.get("host") or "").strip()
+        port = item.get("port")
+        secret = str(item.get("secret") or "").strip()
+        if host and port and secret:
+            lines.append(f"tg://proxy?server={host}&port={port}&secret={secret}")
+    return lines
+
+
 def extract_lines(body: str) -> list[str]:
+    embedded = extract_mtpro_xyz_lines(body)
+    if embedded:
+        return embedded
     stripped = body.strip()
     if stripped.startswith("{") or stripped.startswith("["):
         try:
@@ -290,13 +340,13 @@ def main() -> int:
     feeds_dir = root / "feeds"
 
     ru_urls = [github("kort0881", "telegram-proxy-collector", "main", "proxy_ru.txt")] + [
-        [u] for u in AUTHOR_URLS
+        [u] for u in AUTHOR_URLS + MTPRO_XYZ_URLS
     ]
     eu_urls = [github("kort0881", "telegram-proxy-collector", "main", "proxy_eu.txt")] + [
-        [u] for u in AUTHOR_URLS
+        [u] for u in AUTHOR_URLS + MTPRO_XYZ_URLS
     ]
     etc_urls = [github("kort0881", "telegram-proxy-collector", "main", "proxy_all.txt")] + [
-        [u] for u in ETC_URLS
+        [u] for u in ETC_URLS + MTPRO_XYZ_URLS
     ]
 
     print("=== RU ===", file=sys.stderr)
