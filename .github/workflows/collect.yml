@@ -2,7 +2,8 @@ name: Collect feeds
 
 on:
   schedule:
-    - cron: "19 */4 * * *"
+    # 06:19, 14:19, 22:19 MSK (UTC+3) → 03:19, 11:19, 19:19 UTC
+    - cron: "19 3,11,19 * * *"
   workflow_dispatch:
 
 permissions:
