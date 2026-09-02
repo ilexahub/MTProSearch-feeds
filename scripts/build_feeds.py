@@ -302,14 +302,12 @@ def extract_lines(body: str) -> list[str]:
     return body.splitlines()
 
 
-def accepted(proxy: Proxy, markers: list[str]) -> bool:
+def accepted(proxy: Proxy) -> bool:
     sni = proxy.sni.lower()
-    if any(m in sni for m in BLOCKED):
-        return False
-    return any(m in sni for m in markers)
+    return not any(m in sni for m in BLOCKED)
 
 
-def collect(urls_groups: list[list[str]], markers: list[str]) -> tuple[dict[str, Proxy], dict]:
+def collect(urls_groups: list[list[str]]) -> tuple[dict[str, Proxy], dict]:
     unique: dict[str, Proxy] = {}
     ok = 0
     fail = 0
@@ -323,7 +321,7 @@ def collect(urls_groups: list[list[str]], markers: list[str]) -> tuple[dict[str,
         print(f"OK   {used}", file=sys.stderr)
         for line in extract_lines(body):
             proxy = parse_line(line)
-            if proxy is None or not accepted(proxy, markers):
+            if proxy is None or not accepted(proxy):
                 continue
             unique.setdefault(proxy.host_port, proxy)
     return unique, {"ok": ok, "fail": fail, "kept": len(unique)}
@@ -350,11 +348,11 @@ def main() -> int:
     ]
 
     print("=== RU ===", file=sys.stderr)
-    ru, ru_stats = collect(ru_urls, RU_WHITELIST)
+    ru, ru_stats = collect(ru_urls)
     print("=== EU ===", file=sys.stderr)
-    eu, eu_stats = collect(eu_urls, WIDE_WHITELIST)
+    eu, eu_stats = collect(eu_urls)
     print("=== ETC ===", file=sys.stderr)
-    etc_raw, etc_stats = collect(etc_urls, WIDE_WHITELIST)
+    etc_raw, etc_stats = collect(etc_urls)
 
     ru_eu_keys = set(ru) | set(eu)
     etc = {k: v for k, v in etc_raw.items() if k not in ru_eu_keys}
