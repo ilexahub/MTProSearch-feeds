@@ -2,7 +2,7 @@
 
 Готовые списки MTProto-прокси для [Выручайки](https://github.com/ilexahub/MTProSearch).
 
-GitHub Actions каждые 4 часа обходит публичные источники, разбирает `tg://proxy` / `t.me/proxy` (и встроенный список с [mtpro.xyz/mtproto](https://mtpro.xyz/mtproto)) и пишет три текстовых файла. **Живость не проверяется** — HMAC и `req_pq` делает приложение с сети телефона.
+GitHub Actions три раза в сутки (06:19, 14:19, 22:19 МСК) обходит публичные источники, разбирает `tg://proxy` / `t.me/proxy` (и встроенный список с [mtpro.xyz/mtproto](https://mtpro.xyz/mtproto)) и пишет три текстовых файла. **Живость не проверяется** — HMAC и `req_pq` делает приложение с сети телефона.
 
 ## Файлы
 
