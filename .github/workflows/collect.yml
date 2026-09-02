@@ -2,7 +2,7 @@ name: Collect feeds
 
 on:
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "19 */4 * * *"
   workflow_dispatch:
 
 permissions:
