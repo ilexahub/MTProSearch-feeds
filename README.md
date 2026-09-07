@@ -36,3 +36,13 @@ https://cdn.jsdelivr.net/gh/ilexahub/MTProSearch-feeds@main/feeds/proxy-ru.txt
 То же для `proxy-en.txt`. `proxy-eu.txt` и `proxy-etc.txt` — копии EN.
 
 Собрать локально: `python scripts/build_feeds.py`.
+
+## Статистика скачиваний
+
+raw.githubusercontent.com / jsDelivr **не** отдают владельцу пофайловые access-логи. Счётчики «из Выручайки» считает отдельный beacon-сервис в репо исходников (`scripts/feeds-stats`, деплой Railway): приложение после успешного fetch шлёт `POST /api/feed-hit`. Прямые открытия этих URL в браузере туда не попадают.
+
+Агрегаты: `GET /api/stats?token=…` → hits / uniques / by_feed / by_channel за ~360 дней. Полная спека и чеклист Railway — в Src: `docs/FEEDS_STATS.md`.
+
+## Сжатие
+
+Канон — `.txt`. На диске gzip ≈ **4×** компактнее; по HTTP CDN часто уже жмёт сам (`Content-Encoding: gzip`). Не публиковать `.zip` как единственный URL (ломает старые клиенты). Опциональный `.txt.gz` — только после поддержки в приложении.
