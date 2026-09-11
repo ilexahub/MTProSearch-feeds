@@ -24,15 +24,24 @@ HEX_RE = re.compile(r"^[0-9a-fA-F]+$")
 TG_LINE = re.compile(r"tg://proxy\?|t\.me/proxy", re.I)
 
 RU_WHITELIST = [
-    "vk.com", "vk.ru", "userapi.com", "max.ru", "sberbank", "sber.ru", "sberonline", "online.sber",
-    "tinkoff", "vtb.ru", "alfabank", "alfa-bank", "gosuslugi", "nalog.gov", "nalog.ru", "mos.ru",
-    "yandex", "ya.ru", "dzen.ru", "mail.ru", "ok.ru", "rutube", "kinopoisk", "ozon.ru",
-    "ozonusercontent", "wildberries", "wb.ru", "avito.ru", "hh.ru", "cian.ru", "microsoft.ru",
-    "mts.ru", "beeline.ru", "megafon.ru", "1c.ru", "1c.com", "1c.", "petrovich", "x5.ru", "x5.",
-    "game.ru", "dns-shop", "magnit.ru", "beboo.ru",
+    # Keep in sync with MTProSearchSrc WHITELIST_SNI.md / ProxyCriteria.kt
+    # Ref: https://github.com/hxehex/russia-mobile-internet-whitelist
+    "vk.com", "vk.ru", "userapi.com", "vk-portal.net", "max.ru", "oneme.ru", "rutube", "kremlin.ru",
+    "sberbank", "sber.ru", "sberonline", "online.sber",
+    "tinkoff", "tbank", "vtb.ru", "alfabank", "alfa-bank", "psbank.ru", "mironline.ru", "nspk.ru",
+    "gosuslugi", "gov.ru", "nalog.gov", "nalog.ru", "mos.ru", "cbr.ru", "pochta.ru",
+    "yandex", "ya.ru", "yastatic.net", "dzen.ru",
+    "mail.ru", "ok.ru", "okcdn.ru", "pikabu.ru", "hh.ru",
+    "ozon.ru", "ozone.ru", "ozonusercontent", "wildberries", "wb.ru", "avito.", "dns-shop",
+    "kuper.ru", "samokat.ru", "vku-to.ru",
+    "rzd.ru", "aeroflot.ru", "pobeda.aero", "2gis.", "tutu.ru", "delimobil.ru",
+    "rbc.ru", "tass.ru", "lenta.ru", "gazeta.ru",
+    "kinopoisk", "x5.ru", "x5.", "petrovich", "game.ru", "magnit.ru",
+    "mts.ru", "beeline.ru", "megafon.ru", "1c.ru", "1c.com", "1c.", "cian.ru", "microsoft.ru", "beboo.ru",
 ]
 INTL_WHITELIST = [
-    "steampowered", "cloudflare", "hetzner", "windowsupdate", "google.com", "microsoft.com",
+    "github.com", "wikipedia.org", "stackoverflow.com", "habr.com", "livejournal.com",
+    "steampowered", "steamstatic", "cloudflare", "hetzner", "windowsupdate", "google.com", "microsoft.com",
     "yahoo", "deepseek", "yektanet", "bale.ai", "zoom.us",
 ]
 WIDE_WHITELIST = RU_WHITELIST + INTL_WHITELIST
