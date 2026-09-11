@@ -45,7 +45,21 @@ INTL_WHITELIST = [
     "yahoo", "deepseek", "yektanet", "bale.ai", "zoom.us",
 ]
 WIDE_WHITELIST = RU_WHITELIST + INTL_WHITELIST
-BLOCKED = ["instagram", "facebook", "twitter", "x.com", "bbc", "meduza", "linkedin", "torproject", "tor."]
+# Curated famous DPI/RKN brands only — keep in sync with MTProSearchSrc ProxyCriteria.BLOCKED_SNI / WHITELIST_SNI.md
+BLOCKED = [
+    "instagram", "cdninstagram", "facebook", "fbcdn", "fb.com", "whatsapp",
+    "twitter", "x.com", "linkedin",
+    "discord", "signal.org", "tiktok", "snapchat",
+    "bbc", "meduza", "dw.com", "rferl", "svoboda.org", "currenttime.tv", "voanews",
+    "zona.media", "novayagazeta", "theins.ru", "holod.media", "ovd.info", "ovdinfo",
+    "youtube", "youtu.be", "googlevideo", "ytimg",
+    "openai.com", "chatgpt.com", "claude.ai",
+    "pornhub", "xhamster", "xvideos", "xnxx",
+    "rutracker", "libgen", "sci-hub",
+    "nordvpn", "expressvpn", "mullvad", "proton.me", "protonmail",
+    "spotify", "netflix", "twitch.tv", "soundcloud", "patreon", "medium.com",
+    "torproject", "tor.",
+]
 
 AUTHOR_URLS = [
     "https://raw.githubusercontent.com/SoliSpirit/mtproto/master/all_proxies.txt",
