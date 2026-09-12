@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-11T21:43:46Z",
+  "generated_at": "2026-09-12T07:55:54Z",
   "ports": [
     443,
     853,
@@ -13,10 +13,10 @@
     "kept": 670
   },
   "ru": {
-    "kept": 227
+    "kept": 222
   },
   "en": {
-    "kept": 443
+    "kept": 448
   },
   "legacy_copied": [
     "proxy-eu.txt",
