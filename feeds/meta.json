@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-14T08:56:21Z",
+  "generated_at": "2026-09-14T16:57:50Z",
   "ports": [
     443,
     853,
@@ -8,15 +8,15 @@
   "dedupe": "host|port",
   "split": "ru_whitelist_sni",
   "fetch": {
-    "ok": 37,
-    "fail": 0,
-    "kept": 684
+    "ok": 35,
+    "fail": 2,
+    "kept": 675
   },
   "ru": {
-    "kept": 208
+    "kept": 202
   },
   "en": {
-    "kept": 476
+    "kept": 473
   },
   "legacy_copied": [
     "proxy-eu.txt",
