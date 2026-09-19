@@ -10,8 +10,6 @@ GitHub Actions три раза в сутки (06:19, 14:19, 22:19 МСК) обх
 |------|------------|
 | [feeds/proxy-ru.txt](feeds/proxy-ru.txt) | FakeTLS, порты 443/8443/853, SNI из русского белого списка |
 | [feeds/proxy-en.txt](feeds/proxy-en.txt) | то же формально, все остальные SNI (международные и серые) |
-| [feeds/proxy-eu.txt](feeds/proxy-eu.txt) | копия EN — для старых APK |
-| [feeds/proxy-etc.txt](feeds/proxy-etc.txt) | копия EN — для старых APK |
 | [feeds/meta.json](feeds/meta.json) | время сборки и счётчики |
 
 Источники сливаются в один пул: три корневых файла kort0881, `verified/proxy_us_verified.txt`, `verified/proxy_asia_verified.txt` и 32 сырых URL. География корта файл не выбирает — режет SNI.
@@ -33,7 +31,7 @@ https://raw.githubusercontent.com/ilexahub/MTProSearch-feeds/main/feeds/proxy-ru
 https://cdn.jsdelivr.net/gh/ilexahub/MTProSearch-feeds@main/feeds/proxy-ru.txt
 ```
 
-То же для `proxy-en.txt`. `proxy-eu.txt` и `proxy-etc.txt` — копии EN.
+То же для `proxy-en.txt`. Других списков нет.
 
 Собрать локально: `python scripts/build_feeds.py`.
 

@@ -392,8 +392,9 @@ def main() -> int:
 
     write_list(feeds_dir / "proxy-ru.txt", ru)
     write_list(feeds_dir / "proxy-en.txt", en)
-    write_list(feeds_dir / "proxy-eu.txt", en)
-    write_list(feeds_dir / "proxy-etc.txt", en)
+
+    for stale in ("proxy-eu.txt", "proxy-etc.txt", "proxy-max.txt"):
+        (feeds_dir / stale).unlink(missing_ok=True)
 
     meta = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -403,7 +404,6 @@ def main() -> int:
         "fetch": fetch_stats,
         "ru": {"kept": len(ru)},
         "en": {"kept": len(en)},
-        "legacy_copied": ["proxy-eu.txt", "proxy-etc.txt"],
     }
     (feeds_dir / "meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(meta, indent=2))
