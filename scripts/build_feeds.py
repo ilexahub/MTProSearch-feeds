@@ -371,6 +371,140 @@ def write_list(path: Path, proxies: dict[str, Proxy]) -> None:
     path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
 
+# Disappeared from open sources. This script does not open TCP: it only writes
+# feeds/check.txt. HMAC is scripts/check_missing.py, never against the live pool.
+HOT_DAYS = 30
+FAR_MARKS_DAYS = (60, 90)
+FAR_WINDOW_DAYS = 2
+DROP_AFTER_DAYS = 90 + FAR_WINDOW_DAYS
+
+
+def secret_key(secret: str) -> bytes | None:
+    data = decode_bytes(secret)
+    if not data or len(data) < 18 or data[0] != 0xEE:
+        return None
+    return data[1:17]
+
+
+def evidence_iso(entry: dict) -> str | None:
+    stamps: list[str] = []
+    for field in ("last_seen", "last_ok"):
+        value = entry.get(field)
+        if isinstance(value, str) and value:
+            stamps.append(value)
+    if not stamps:
+        return None
+    try:
+        return max(stamps, key=parse_stamp)
+    except ValueError:
+        return None
+
+
+def compact_entry(entry: dict) -> dict:
+    out = {}
+    for field in ("link", "first_seen", "last_seen", "last_ok", "last_checked"):
+        value = entry.get(field)
+        if value:
+            out[field] = value
+    return out
+
+
+def parse_stamp(iso: str) -> datetime:
+    return datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+
+def retention(age_days: float) -> str:
+    """daily = every run; far = one window; hold = keep but do not publish; drop = delete."""
+    if age_days <= HOT_DAYS:
+        return "daily"
+    for mark in FAR_MARKS_DAYS:
+        if mark <= age_days < mark + FAR_WINDOW_DAYS:
+            return "far"
+    if age_days >= DROP_AFTER_DAYS:
+        return "drop"
+    return "hold"
+
+
+def load_archive(path: Path) -> dict[str, dict]:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    proxies = data.get("proxies") if isinstance(data, dict) else None
+    return proxies if isinstance(proxies, dict) else {}
+
+
+def sync_archive(
+    archive: dict[str, dict],
+    pool: dict[str, Proxy],
+    now: datetime,
+) -> tuple[dict[str, Proxy], dict]:
+    """Remember every host|port. Queue disappeared ones into check.txt. No TCP."""
+    stamp = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    for key, proxy in pool.items():
+        prev = archive.get(key) if isinstance(archive.get(key), dict) else {}
+        archive[key] = compact_entry(
+            {
+                "link": proxy.link,
+                "first_seen": (prev or {}).get("first_seen") or stamp,
+                "last_seen": stamp,
+                "last_ok": (prev or {}).get("last_ok"),
+                "last_checked": (prev or {}).get("last_checked"),
+            }
+        )
+
+    due: dict[str, Proxy] = {}
+    daily = far = held = dropped = 0
+    for key in list(archive):
+        if key in pool:
+            continue
+        entry = archive.get(key)
+        if not isinstance(entry, dict) or not entry.get("link"):
+            del archive[key]
+            dropped += 1
+            continue
+        iso = evidence_iso(entry)
+        if not iso:
+            del archive[key]
+            dropped += 1
+            continue
+        try:
+            age = (now - parse_stamp(iso)).total_seconds() / 86400
+        except ValueError:
+            del archive[key]
+            dropped += 1
+            continue
+        state = retention(age)
+        if state == "drop":
+            del archive[key]
+            dropped += 1
+            continue
+        if state == "hold":
+            held += 1
+            continue
+        proxy = parse_line(str(entry["link"]))
+        if proxy is None or not accepted(proxy) or proxy.host_port != key:
+            del archive[key]
+            dropped += 1
+            continue
+        due[key] = proxy
+        if state == "daily":
+            daily += 1
+        else:
+            far += 1
+    stats = {
+        "known": len(archive),
+        "queued": len(due),
+        "queued_daily": daily,
+        "queued_far": far,
+        "held": held,
+        "dropped": dropped,
+    }
+    return due, stats
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     feeds_dir = root / "feeds"
@@ -382,6 +516,19 @@ def main() -> int:
     print("=== ALL ===", file=sys.stderr)
     pool, fetch_stats = collect(all_urls)
 
+    now = datetime.now(timezone.utc)
+    archive_path = feeds_dir / "archive.json"
+    archive = load_archive(archive_path)
+    due, archive_stats = sync_archive(archive, pool, now)
+    archive_path.write_text(
+        json.dumps(
+            {"proxies": {key: compact_entry(archive[key]) for key in sorted(archive)}},
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
     ru: dict[str, Proxy] = {}
     en: dict[str, Proxy] = {}
     for key, proxy in pool.items():
@@ -392,6 +539,7 @@ def main() -> int:
 
     write_list(feeds_dir / "proxy-ru.txt", ru)
     write_list(feeds_dir / "proxy-en.txt", en)
+    write_list(feeds_dir / "check.txt", due)
 
     for stale in ("proxy-eu.txt", "proxy-etc.txt", "proxy-max.txt"):
         (feeds_dir / stale).unlink(missing_ok=True)
@@ -404,6 +552,7 @@ def main() -> int:
         "fetch": fetch_stats,
         "ru": {"kept": len(ru)},
         "en": {"kept": len(en)},
+        "archive": archive_stats,
     }
     (feeds_dir / "meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(meta, indent=2))
