@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-28T23:49:44Z",
+  "generated_at": "2026-09-29T09:51:21Z",
   "ports": [
     443,
     853,
@@ -10,24 +10,24 @@
   "fetch": {
     "ok": 34,
     "fail": 3,
-    "kept": 653
+    "kept": 665
   },
   "ru": {
-    "kept": 302
+    "kept": 319
   },
   "en": {
-    "kept": 500
+    "kept": 485
   },
   "archive": {
-    "known": 2233,
-    "queued": 1580,
-    "queued_daily": 1580,
+    "known": 2257,
+    "queued": 1592,
+    "queued_daily": 1592,
     "queued_far": 0,
     "held": 0,
     "dropped": 0,
-    "probed": 561,
-    "alive": 149,
-    "deferred": 1019,
+    "probed": 579,
+    "alive": 139,
+    "deferred": 1013,
     "skipped_live": 0
   }
 }
