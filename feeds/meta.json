@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T14:13:03Z",
+  "generated_at": "2026-10-17T21:29:00Z",
   "ports": [
     443,
     853,
@@ -8,26 +8,26 @@
   "dedupe": "host|port",
   "split": "ru_whitelist_sni",
   "fetch": {
-    "ok": 23,
-    "fail": 14,
-    "kept": 783
+    "ok": 21,
+    "fail": 16,
+    "kept": 796
   },
   "ru": {
-    "kept": 521
+    "kept": 507
   },
   "en": {
-    "kept": 513
+    "kept": 516
   },
   "archive": {
-    "known": 3894,
-    "queued": 3111,
-    "queued_daily": 3111,
+    "known": 3938,
+    "queued": 3142,
+    "queued_daily": 3142,
     "queued_far": 0,
     "held": 0,
     "dropped": 0,
-    "probed": 620,
-    "alive": 251,
-    "deferred": 2491,
+    "probed": 592,
+    "alive": 227,
+    "deferred": 2550,
     "skipped_live": 0
   }
 }
