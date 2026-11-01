@@ -104,5 +104,15 @@ class ArchiveRetentionTest(unittest.TestCase):
         self.assertEqual("daily", feeds.retention(age))
 
 
+class BlockedSniTest(unittest.TestCase):
+    def test_fox_and_motor_stay(self) -> None:
+        self.assertFalse(feeds.is_blocked_sni("fox.com"))
+        self.assertFalse(feeds.is_blocked_sni("motor.ru"))
+
+    def test_x_com_is_host_only(self) -> None:
+        self.assertTrue(feeds.is_blocked_sni("x.com"))
+        self.assertTrue(feeds.is_blocked_sni("www.x.com"))
+
+
 if __name__ == "__main__":
     unittest.main()

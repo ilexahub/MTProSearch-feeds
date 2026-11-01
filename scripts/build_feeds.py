@@ -48,7 +48,7 @@ WIDE_WHITELIST = RU_WHITELIST + INTL_WHITELIST
 # Curated famous DPI/RKN brands only — keep in sync with MTProSearchSrc ProxyCriteria.BLOCKED_SNI / WHITELIST_SNI.md
 BLOCKED = [
     "instagram", "cdninstagram", "facebook", "fbcdn", "fb.com", "whatsapp",
-    "twitter", "x.com", "linkedin",
+    "twitter", "linkedin",
     "discord", "signal.org", "tiktok", "snapchat",
     "bbc", "meduza", "dw.com", "rferl", "svoboda.org", "currenttime.tv", "voanews",
     "zona.media", "novayagazeta", "theins.ru", "holod.media", "ovd.info", "ovdinfo",
@@ -58,7 +58,7 @@ BLOCKED = [
     "rutracker", "libgen", "sci-hub",
     "nordvpn", "expressvpn", "mullvad", "proton.me", "protonmail",
     "spotify", "netflix", "twitch.tv", "soundcloud", "patreon", "medium.com",
-    "torproject", "tor.",
+    "torproject",
 ]
 
 AUTHOR_URLS = [
@@ -335,9 +335,15 @@ def extract_lines(body: str) -> list[str]:
     return body.splitlines()
 
 
+def is_blocked_sni(sni: str) -> bool:
+    domain = sni.lower()
+    if domain == "x.com" or domain.endswith(".x.com"):
+        return True
+    return any(marker in domain for marker in BLOCKED)
+
+
 def accepted(proxy: Proxy) -> bool:
-    sni = proxy.sni.lower()
-    return not any(m in sni for m in BLOCKED)
+    return not is_blocked_sni(proxy.sni)
 
 
 def is_ru_sni(sni: str) -> bool:
